@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ts视频合并下载器</title>
+  <style>
+    
+/*    html {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }*/
+html {
+  font-size: 12px;
+}
+
+    .container {
+      width: 480px;
+      //background: linear-gradient(#3facff, #1f9eff);
+    }
+    p {
+      margin: 0;
+    }
+
+    .row {
+      padding: 6px 10px;
+    }
+    .label {
+      display: inline-block;
+      width: 70px;
+      text-align: right;
+    }
+/*    .url-input {
+      width: 240px;
+      padding: 6px 8px;
+      margin-left: 10px;
+      border: 1px solid #c2c9c1;
+      outline: none;
+      resize:none
+    }*/
+
+
+    .info {
+      border: 1px solid grey;
+      height: 100px;
+    }
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <label class="label">下载地址:</label>
+    <input class="url-input" value="http://pl-ali.youku.com/playlist/m3u8?vid=XNDAwNDUxMzUyOA%3D%3D&type=flvhdv3&ups_client_netip=ded19007&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=d0c5768bfd51257c6f499fdb5197c890&duration=6174&expire=18000&drm_type=1&drm_device=7&ups_ts=1548401530&onOff=0&encr=0&ups_key=fe1843b05c40bfcc8dcf903da9af60e9" placeholder="请输入m3u8地址" id="m3u8Input"/>
+  </div>
+  <div class="row">
+    <label class="label">文件名:</label>
+    <input class="url-input" value="name"/><span style="font-size: 16px">.ts</span>
+  </div>
+  <div class="row">
+    <label class="label">保存路径:</label>
+    <input class="url-input" id="savePathInput"/>
+    <button class="download-btn" id="chooseDirBtn">浏览</button>
+    <button class="download-btn" id="downloadBtn">立即下载</button>
+  </div>
+  <div class="row" id="info">
+    <p id="progressInfo" hidden>下载文件...(<span id="doneCount">0</span>/<span id="taskCount">0</span>)</p>
+    <p id="finishInfo" hidden></p>
+  </div>
+</div>
+<script>
+const ipcRenderer = require('electron').ipcRenderer
+const { getList } = require('./download')
+const querySelector = document.querySelector.bind(document)
+
+const savePath = localStorage.getItem('savePath')
+if (savePath) querySelector('#savePathInput').value = savePath
+
+
+querySelector('#chooseDirBtn').onclick = function () {
+  ipcRenderer.send('openDirectory')
+}
+
+ipcRenderer.on('savePath', function (event, path) {
+  querySelector('#savePathInput').value = path
+  localStorage.setItem('savePath', path)
+})
+
+querySelector('#downloadBtn').addEventListener('click', function () {
+  getList(querySelector('#m3u8Input').value, function ({ doneCount, failCount }) {
+    querySelector('#doneCount').innerHTML = doneCount
+  }, function ({ taskCount, doneCount, failCount }) {
+    querySelector('#progressInfo').setAttribute('hidden', '')
+    querySelector('#finishInfo').removeAttribute('hidden')
+    if (taskCount === failCount) {
+      querySelector('#info').innerHTML = '下载失败：链接已失效'
+    } else if (doneCount < taskCount) {
+      querySelector('#info').innerHTML = `下载完成，失败${failCount}, 是否重试？<a href="#">是</a>/ <a href="#">否，直接合并</a>`
+    } else {
+      querySelector('#info').innerHTML = `下载完成。<a href="#">打开</a> <a href="#">打开文件夹</a>`
+    }
+
+  }).then(function (taskCount) {
+    querySelector('#taskCount').innerHTML = taskCount
+    querySelector('#progressInfo').removeAttribute('hidden')
+  })
+})
+</script>
+</body>
+</html>

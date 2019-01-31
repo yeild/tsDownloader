@@ -10,13 +10,14 @@ module.exports = {
           data += chunk
         })
         res.on('end', function () {
-          resolve({ status: res.statusCode, data })
+          resolve({ statusCode: res.statusCode, data })
         })
         res.on('error',reject)
       })
     })
   },
-  getBuffer (url) {
+  getBinary (url) {
+    url = url.replace(/^https?/, 'http')
     return new Promise(function (resolve, reject) {
       http.get(url, function (res) {
         let data = Buffer.from([])
@@ -24,7 +25,7 @@ module.exports = {
           data = Buffer.concat([data, Buffer.from(chunk)])
         })
         res.on('end', function () {
-          resolve({ status: res.statusCode, data })
+          resolve({ statusCode: res.statusCode, data })
         })
         res.on('error', reject)
       })
