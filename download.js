@@ -1,20 +1,18 @@
 const fs = require('fs')
 
-// const exec = require('child_process').exec
-const { get, getBinary } = require('./http')
+const { get } = require('./http')
 
 // const m3u8 = 'http://pl-ali.youku.com/playlist/m3u8?vid=XNDAwNDUxMzUyOA%3D%3D&type=flvhdv3&ups_client_netip=ded19007&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=d0c5768bfd51257c6f499fdb5197c890&duration=6174&expire=18000&drm_type=1&drm_device=7&ups_ts=1548401530&onOff=0&encr=0&ups_key=fe1843b05c40bfcc8dcf903da9af60e9'
 
 const downloadTask = []
-const chunkMap = {}
-let taskCount = 0
+const failedList = []
 let doneCount = 0
 let failCount = 0
 
 const videoList = []
 exports.resolve = function (m3u8) {
   return new Promise(function (resolve, reject) {
-    get(m3u8).then(function ({ statusCode, data }) {
+    get({ url: m3u8 }).then(function ({ statusCode, data }) {
       if (statusCode !== 200) {
         reject(statusCode)
         return
@@ -30,12 +28,28 @@ exports.resolve = function (m3u8) {
   })
 }
 
-exports.download = function ({ videoList, progress, finish}) {
-  // todo
+exports.download = function ({ videoList, progress, finish }) {
+  videoList.forEach(function (video, index) {
+    addToTask(video, index, progress)
+  })
+  Promise.all(downloadTask).then(function () {
+    failedList.forEach(function (video, index) {
+      addToTask(video, index, progress)
+    })
+    const writeStream = fs.createWriteStream('name.ts')
+
+    fs.readdir('temp', function (e, files) {
+      files.forEach(file => {
+        writeStream.write(fs.readFileSync('temp/'+ file))
+      })
+
+      finish({ doneCount, failCount })
+    })
+  })
 }
 
 
-exports.getList = function (m3u8, singleTaskFinish, allTaskFinish) {
+/*exports.getList = function (m3u8, singleTaskFinish, allTaskFinish) {
   return new Promise(function (resolve, reject) {
     get(m3u8).then(function ({ statusCode, data }) {
       if (statusCode !== 200) {
@@ -44,7 +58,7 @@ exports.getList = function (m3u8, singleTaskFinish, allTaskFinish) {
       }
       const lines = data.split('\r\n')
       lines.forEach((line) => {
-        if (/^http.*\.ts.*/.test(line)) {
+        if (/^http.*\.ts.*!/.test(line)) {
           addToTask(line, taskCount, singleTaskFinish)
           taskCount++
         }
@@ -55,20 +69,21 @@ exports.getList = function (m3u8, singleTaskFinish, allTaskFinish) {
       })
     })
   })
-}
+}*/
 
-const writeStream = fs.createWriteStream('name.ts')
-
-function addToTask (url, index, singleTaskFinish) {
-  downloadTask.push(getBinary(url).then(function ({ statusCode, data }) {
-
-    if (statusCode !== 200) failCount++
+function addToTask (url, index, progress) {
+  downloadTask.push(get({ url, responseType: 'binary' }).then(function ({ statusCode, data }) {
+    if (statusCode !== 200) {
+      failCount++
+      failedList.push(url)
+    }
     else {
       doneCount++
-      chunkMap[index] = data
+      fs.writeFile('temp/'+ index, data, function (err) {
+        if (err) throw err
+      })
     }
-
-    singleTaskFinish({ statusCode, doneCount, failCount })
+    progress({ doneCount, failCount })
   }))
 }
 

@@ -66,12 +66,16 @@ html {
   </div>
   <div class="row" id="info">
     <p id="progressInfo" hidden>下载文件...(<span id="doneCount">0</span>/<span id="taskCount">0</span>)</p>
+    <p id="failInfo" hidden>下载失败：<span id="failCount">0</span></p>
     <p id="finishInfo" hidden></p>
+  </div>
+  <div class="row" id="failList">
+
   </div>
 </div>
 <script>
 const ipcRenderer = require('electron').ipcRenderer
-const { getList } = require('./download')
+const { resolve, download } = require('./download')
 const querySelector = document.querySelector.bind(document)
 
 const savePath = localStorage.getItem('savePath')
@@ -88,22 +92,31 @@ ipcRenderer.on('savePath', function (event, path) {
 })
 
 querySelector('#downloadBtn').addEventListener('click', function () {
-  getList(querySelector('#m3u8Input').value, function ({ doneCount, failCount }) {
-    querySelector('#doneCount').innerHTML = doneCount
-  }, function ({ taskCount, doneCount, failCount }) {
-    querySelector('#progressInfo').setAttribute('hidden', '')
-    querySelector('#finishInfo').removeAttribute('hidden')
-    if (taskCount === failCount) {
-      querySelector('#info').innerHTML = '下载失败：链接已失效'
-    } else if (doneCount < taskCount) {
-      querySelector('#info').innerHTML = `下载完成，失败${failCount}, 是否重试？<a href="#">是</a>/ <a href="#">否，直接合并</a>`
-    } else {
-      querySelector('#info').innerHTML = `下载完成。<a href="#">打开</a> <a href="#">打开文件夹</a>`
-    }
-
-  }).then(function (taskCount) {
-    querySelector('#taskCount').innerHTML = taskCount
+  const m3u8 = querySelector('#m3u8Input').value
+  resolve(m3u8).then(function (videoList) {
+    querySelector('#taskCount').innerHTML = videoList.length
     querySelector('#progressInfo').removeAttribute('hidden')
+    download({
+      videoList,
+      progress ({ doneCount, failCount }) {
+        if (failCount > 0) {
+          querySelector('#failCount').innerHTML = failCount
+        }
+        querySelector('#doneCount').innerHTML = doneCount
+      },
+      finish ({ doneCount, failCount }) {
+        querySelector('#progressInfo').setAttribute('hidden', '')
+        querySelector('#finishInfo').removeAttribute('hidden')
+        const taskCount = videoList.length
+        if (failCount === taskCount) {
+          querySelector('#info').innerHTML = '下载失败：链接已失效'
+        } else if (doneCount < taskCount) {
+          querySelector('#info').innerHTML = `下载完成，成功${doneCount}, 失败${failCount}, 是否重新下载失败文件？<a href="#">是</a>/ <a href="#">否，直接合并</a>`
+        } else {
+          querySelector('#info').innerHTML = `下载完成。<a href="#">打开</a> <a href="#">打开文件夹</a>`
+        }
+      }
+    })
   })
 })
 </script>
