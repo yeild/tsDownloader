@@ -52,15 +52,15 @@ html {
 <div class="container">
   <div class="row">
     <label class="label">下载地址:</label>
-    <input class="url-input" value="http://pl-ali.youku.com/playlist/m3u8?vid=XNDAwNDUxMzUyOA%3D%3D&type=flvhdv3&ups_client_netip=ded19007&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=d0c5768bfd51257c6f499fdb5197c890&duration=6174&expire=18000&drm_type=1&drm_device=7&ups_ts=1548401530&onOff=0&encr=0&ups_key=fe1843b05c40bfcc8dcf903da9af60e9" placeholder="请输入m3u8地址" id="m3u8Input"/>
+    <input class="url-input" value="https://pl-ali.youku.com/playlist/m3u8?vid=XNDAwNDUxMzUyOA%3D%3D&type=flvhdv3&ups_client_netip=7d4674aa&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=c4764aed156e607e8980010102e61ded&duration=6174&expire=18000&drm_type=1&drm_device=7&ups_ts=1550043795&onOff=0&encr=0&ups_key=f3ebf1bc8228e6757f9e239118314830" placeholder="请输入m3u8地址" id="m3u8Input"/>
   </div>
   <div class="row">
     <label class="label">文件名:</label>
-    <input class="url-input" value="name"/><span style="font-size: 16px">.ts</span>
+    <input class="url-input" value="name" id="filename"/><span style="font-size: 16px">.ts</span>
   </div>
   <div class="row">
     <label class="label">保存路径:</label>
-    <input class="url-input" id="savePathInput"/>
+    <input class="url-input" readonly id="savePathInput"/>
     <button class="download-btn" id="chooseDirBtn">浏览</button>
     <button class="download-btn" id="downloadBtn">立即下载</button>
   </div>
@@ -74,13 +74,14 @@ html {
   </div>
 </div>
 <script>
+const path = require('path')
+const shell = require('electron').shell
 const ipcRenderer = require('electron').ipcRenderer
 const { resolve, download } = require('./download')
 const querySelector = document.querySelector.bind(document)
 
-const savePath = localStorage.getItem('savePath')
+let savePath = localStorage.getItem('savePath')
 if (savePath) querySelector('#savePathInput').value = savePath
-
 
 querySelector('#chooseDirBtn').onclick = function () {
   ipcRenderer.send('openDirectory')
@@ -91,9 +92,21 @@ ipcRenderer.on('savePath', function (event, path) {
   localStorage.setItem('savePath', path)
 })
 
+document.addEventListener('click', function (e) {
+  if (e.target.id == 'openDir'){
+    console.log(querySelector('#savePathInput').value)
+    shell.showItemInFolder(querySelector('#savePathInput').value)
+  }
+  if (e.target.id == 'openFile'){
+    shell.openItem(path.resolve(querySelector('#savePathInput').value, 'name.ts'))
+  }
+})
 querySelector('#downloadBtn').addEventListener('click', function () {
-  const m3u8 = querySelector('#m3u8Input').value
-  resolve(m3u8).then(function (videoList) {
+  resolve({
+    m3u8: querySelector('#m3u8Input').value,
+    savePath: querySelector('#savePathInput').value,
+    filename: querySelector('#filename').value + '.ts'
+  }).then(function (videoList) {
     querySelector('#taskCount').innerHTML = videoList.length
     querySelector('#progressInfo').removeAttribute('hidden')
     download({
@@ -113,7 +126,7 @@ querySelector('#downloadBtn').addEventListener('click', function () {
         } else if (doneCount < taskCount) {
           querySelector('#info').innerHTML = `下载完成，成功${doneCount}, 失败${failCount}, 是否重新下载失败文件？<a href="#">是</a>/ <a href="#">否，直接合并</a>`
         } else {
-          querySelector('#info').innerHTML = `下载完成。<a href="#">打开</a> <a href="#">打开文件夹</a>`
+          querySelector('#info').innerHTML = `下载完成。<a href="#" id="openFile">打开</a> <a href="#" id="openDir">打开文件夹</a>`
         }
       }
     })

@@ -11,12 +11,9 @@ exports.get = function ({ url, responseType }) {
       res.on('end', function () {
         resolve({ statusCode: res.statusCode, data: responseType === 'binary' ? data : data.toString() })
       })
-      res.on('error', reject)
     }).setTimeout(15000, function () {
       this.abort()
-      resolve({ statusCode: 408 })
-    }).on('error', function () {
-      reject({ statusCode: 500 })
-    })
+      reject({ statusCode: 408, msg: 'Request Timeout'})
+    }).on('error', reject)
   })
 }
