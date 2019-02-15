@@ -1,7 +1,8 @@
 const http = require('http')
 
 exports.get = function ({ url, responseType }) {
-  url = url.replace(/^https?/, 'http')
+  url = url.replace(/^https?/, 'http') // https转为http请求
+  if (!/^http:\/\//.test(url))  url = 'http://' + url
   return new Promise(function (resolve, reject) {
     http.get(url, function (res) {
       let data = Buffer.from([])

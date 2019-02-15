@@ -7,11 +7,11 @@ function createWindow () {
   win = new BrowserWindow({ width: 600, height: 370, frame: true })
   win.webContents.openDevTools()
   // 然后加载应用的 index.html。
-  win.loadFile('./index.html')
+  win.loadFile('./src/render/index.html')
 
   ipcMain.on('openDirectory', function ({ sender }) {
     dialog.showOpenDialog({ properties: ['openDirectory'] }, function (files) {
-      if (files) sender.send('savePath', files[0])
+      if (files) sender.send('setSavePath', files[0])
     })
   })
 }

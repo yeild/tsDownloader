@@ -1,0 +1,87 @@
+html {
+  font-size: 12px;
+}
+
+.container {
+  width: 480px;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+button[disabled] {
+  color: inherit;
+}
+
+.fs-16 {
+  font-size: 16px;
+}
+
+.row {
+  padding: 6px 10px;
+}
+
+.label {
+  display: inline-block;
+  width: 70px;
+  text-align: right;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-active:before {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 8px;
+  height: 8px;
+  top: 25px;
+  left: 30px;
+  background: white;
+  border: 1px solid #000;
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+  transform: rotate(45deg);
+  z-index: 3;
+}
+
+.tooltip-active:after {
+  content: attr(tips);
+  position: absolute;
+  top: 30px;
+  left: 10px;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-family: monospace;
+  z-index: 2;
+}
+
+.prepareInfo, .progressInfo, .errorInfo, .finishInfo {
+  display: none;
+}
+
+.info-prepare .prepareInfo {
+  display: inherit;
+}
+
+.info-progress .progressInfo {
+  display: inherit;
+}
+
+.info-error .errorInfo {
+  display: inherit;
+}
+
+.info-success .finishInfo {
+  display: inherit;
+}
