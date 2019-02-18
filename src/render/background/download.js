@@ -1,11 +1,13 @@
 const fs = require('fs')
 const path = require('path')
 const { get } = require('./http')
+const { decrypt } = require('./decrypt')
 
 const downloadConfig = {
   temp: '', // 缓存文件路径
   filename: '', // 保存文件的完整路径
   maxRequestTime: 5, // 最大重试次数
+  key: null, // encrypt key
   set ({ temp, filename }) {
     this.temp = temp
     this.filename = filename
@@ -33,12 +35,30 @@ exports.resolve = function ({ m3u8, savePath, filename }) {
     const videoList = []
     get({ url: m3u8 }).then(function ({ statusCode, data }) {
       if (statusCode !== 200) return reject(statusCode)
-      const lines = data.split('\r\n')
+      const lines = data.split('\n')
+      const encryptInfo = {}
       lines.forEach(function (line, index) {
-        if (/^http.*\.ts.*/.test(line)) videoList.push({ url: line, name: index.toString() })
+        line = line.trim()
+        if (/\.ts/.test(line)) videoList.push({ url: new URL(line, m3u8).href, name: index.toString() })
+        if (/#EXT-X-KEY/.test(line)) line.split(',').forEach(function (pair) {
+          const key = pair.split('=')[0]
+          const value = pair.split('=')[1]
+          try {
+            encryptInfo[key] = JSON.parse(value)
+          } catch (e) {
+            encryptInfo[key] = value
+          }
+        })
       })
       if (videoList.length === 0) reject('未能识别到视频文件')
-      resolve(videoList)
+      if (!encryptInfo.key) resolve(videoList)
+      else {
+        get({ url: new URL(encryptInfo.key, m3u8).href}).then(function ({ statusCode, data }) {
+          if (statusCode !== 200) return reject('获取密钥失败')
+          downloadConfig.key = data
+          resolve(videoList)
+        })
+      }
     }).catch(function (e) {
       console.log(e)
       reject('无效的链接')
@@ -55,8 +75,9 @@ function download ({ videoList, progress, finish }) {
     downloadTask.push(get({ url, responseType: 'binary' }).then(function ({ statusCode, data }) {
       if (statusCode !== 200) downloadStatus.failedList.push(video)
       else {
-        const temp = downloadConfig.temp
+        const { temp, key } = downloadConfig
         if (!fs.existsSync(temp)) fs.mkdirSync(temp)
+        if (key) data = decrypt(key, data) // 解密文件
         fs.writeFileSync(path.resolve(temp, name), data)
         progress({ doneCount: downloadStatus.doneCount++ })
       }
@@ -99,20 +120,3 @@ function handlePromiseDone (requestList, progress, finish) {
     console.log(e)
   })
 }
-/*
-
- get(m3u8).then(function ({ data }) {
- const lines = data.split('\r\n')
- let nameIndex = 0
- lines.forEach((line) => {
- /!*      if (/^#EXT-X-KEY/.test(line)) {
- // 格式 #EXT-X-KEY:METHOD=AES-128,URI="key.key"
- const methodIndex = line.indexOf('METHOD=') + 7
- const method = line.substring(methodIndex, line.indexOf(',', methodIndex))
- const uri = line.substring(line.indexOf('URI=') + 4)
- // todo decrypt
- }*!/
- if (/^http.*\.ts.*!/.test(line)) addToTask(line, nameIndex++ + '.ts')
- })
- })
- */
