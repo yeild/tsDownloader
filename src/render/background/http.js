@@ -1,10 +1,11 @@
 const http = require('http')
+const https = require('https')
 
 exports.get = function ({ url, responseType }) {
-  url = url.replace(/^https?/, 'http') // https转为http请求
-  if (!/^http:\/\//.test(url))  url = 'http://' + url
+  if (!/^https?:\/\//.test(url))  url = 'http://' + url
+  const protocol = /^http:\/\//.test(url) ? http : https
   return new Promise(function (resolve, reject) {
-    http.get(url, function (res) {
+    protocol.get(url, function (res) {
       let data = Buffer.from([])
       res.on('data', function (chunk) {
         data = Buffer.concat([data, Buffer.from(chunk)])

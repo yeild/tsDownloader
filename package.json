@@ -1,9 +1,10 @@
 {
+  "name": "tsDownloader",
   "main": "src/main.js",
   "scripts": {
     "start": "electron ."
   },
-  "dependencies": {
+  "devDependencies": {
     "electron": "^4.0.2"
   }
 }

@@ -52,7 +52,6 @@ addEventListener('#chooseDirBtn', 'click', function () {
 })
 
 ipcRenderer.on('setSavePath', function (event, path) {
-  console.log(path)
   downloadInfo.setSavePath(path)
 })
 
@@ -65,6 +64,10 @@ addEventListener('#openFile', 'click', function () {
 })
 
 addEventListener('#downloadBtn', 'click', function () {
+  if (querySelector('#m3u8Input').value === '') {
+    showTips('url', `请输入下载地址`)
+    return
+  }
   if (querySelector('#filename').value === '') {
     showTips('filename', `请输入文件名`)
     return

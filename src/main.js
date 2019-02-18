@@ -1,13 +1,9 @@
-const { app, BrowserWindow, Menu, shell, ipcMain, dialog } = require('electron')
-
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 
 function createWindow () {
-  // Menu.setApplicationMenu(null)
-  // 创建浏览器窗口
-  win = new BrowserWindow({ width: 600, height: 370, frame: true })
-  win.webContents.openDevTools()
-  // 然后加载应用的 index.html。
-  win.loadFile('./src/render/index.html')
+  const window = new BrowserWindow({ width: 430, height: 180, frame: true })
+  window.setMenu(null)
+  window.loadFile('./src/render/index.html')
 
   ipcMain.on('openDirectory', function ({ sender }) {
     dialog.showOpenDialog({ properties: ['openDirectory'] }, function (files) {
