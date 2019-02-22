@@ -9,7 +9,7 @@ function createWindow () {
     transparent: true
   })
   window.setMenu(null)
-  //window.webContents.openDevTools()
+  // window.webContents.openDevTools()
   window.loadFile('./src/render/index.html')
 
   ipcMain.on('openDirectory', function ({ sender }) {
@@ -19,6 +19,7 @@ function createWindow () {
   })
   ipcMain.on('exit', function () {
     window.close()
+    app.quit()
   })
 }
 

@@ -3,13 +3,22 @@ const path = require('path')
 const { ipcRenderer, shell } = require('electron')
 const { resolve, download, cancel } = require('./background/download')
 
+const store = {
+  getSavePath () {
+    return fs.readFileSync(path.resolve(__dirname, 'config/path')).toString()
+  },
+  setSavePath (text) {
+    fs.writeFileSync(path.resolve(__dirname, 'config/path'), text)
+  }
+}
+
 const querySelector = document.querySelector.bind(document)
 const addEventListener = function (selector, event, handler) {
   querySelector(selector).addEventListener(event, handler)
 }
 
 const downloadInfo = (function () {
-  const defaultSavePath = localStorage.getItem('savePath') || 'C:'
+  const defaultSavePath = store.getSavePath()
   const ext = '.ts' // 文件默认后缀
   const savePathInput = querySelector('#savePathInput')
   const filenameInput = querySelector('#filenameInput')
@@ -26,7 +35,7 @@ const downloadInfo = (function () {
       return savePathInput.value
     },
     setSavePath (path) {
-      localStorage.setItem('savePath', path)
+      store.setSavePath(path)
       savePathInput.value = path
     },
     getFilename () {
@@ -87,7 +96,6 @@ addEventListener('#downloadBtn', 'click', function () {
     filename: downloadInfo.getFilename()
   }).then(function (videoList) {
     clearTimeout(id)
-    // querySelector('#taskCount').innerHTML = videoList.length
     const totalCount = videoList.length
     setInfoStatus('progress')
     querySelector('#progressBar').style.width = 0

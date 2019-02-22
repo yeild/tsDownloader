@@ -2,9 +2,11 @@
   "name": "tsDownloader",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-packager . --icon=src/render/assets/icon.ico --out=dist --overwrite"
   },
   "devDependencies": {
-    "electron": "^4.0.2"
+    "electron": "^4.0.2",
+    "electron-packager": "^13.1.0"
   }
 }
