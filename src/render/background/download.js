@@ -8,10 +8,27 @@ const downloadConfig = {
   filename: '', // 保存文件的完整路径
   maxRequestTime: 5, // 最大重试次数
   key: null, // encrypt key
+  canceled: false, // 是否取消下载
   set ({ temp, filename }) {
     this.temp = temp
     this.filename = filename
   }
+}
+
+exports.cancel = function () {
+  downloadConfig.canceled = true
+  // 删除缓存文件夹
+  return new Promise(function (resolve) {
+    const temp = downloadConfig.temp
+    fs.readdir(temp, function (err, files) {
+      if (err) return resolve()
+      files.forEach(function (file) {
+        fs.unlinkSync(path.resolve(temp, file)) // 删除缓存文件
+      })
+      fs.rmdirSync(path.resolve(temp)) // 删除temp文件夹
+      resolve()
+    })
+  })
 }
 
 const downloadStatus = {
@@ -66,13 +83,12 @@ exports.resolve = function ({ m3u8, savePath, filename }) {
   })
 }
 
-exports.download = download
-
 function download ({ videoList, progress, finish }) {
   const downloadTask = []
   videoList.forEach(function (video) {
     const { url, name } = video
     downloadTask.push(get({ url, responseType: 'binary' }).then(function ({ statusCode, data }) {
+      if (downloadConfig.canceled) return // 取消下载
       if (statusCode !== 200) downloadStatus.failedList.push(video)
       else {
         const { temp, key } = downloadConfig
@@ -92,7 +108,8 @@ function download ({ videoList, progress, finish }) {
 
 function handlePromiseDone (requestList, progress, finish) {
   Promise.all(requestList).then(function () {
-    const { temp, filename, maxRequestTime } = downloadConfig
+    const { temp, filename, maxRequestTime, canceled } = downloadConfig
+    if (canceled) return
     const { failedList, doneCount } = downloadStatus
     const failCount = failedList.length
     if (failCount > 0 && downloadStatus.requestTime++ < maxRequestTime) { // 如果有失败视频并且尝试次数不超过最大尝试次数
@@ -120,3 +137,5 @@ function handlePromiseDone (requestList, progress, finish) {
     console.log(e)
   })
 }
+
+exports.download = download

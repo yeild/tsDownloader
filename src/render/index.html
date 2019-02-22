@@ -12,17 +12,18 @@
     ts视频下载器
     <img src="assets/close.png" class="icon-close" id="closeBtn">
   </div>
-
   <div class="row">
     <label class="label">下载地址: </label>
     <div class="tooltip" id="urlTooltip">
-      <input class="form-control" id="m3u8Input" value="https://pl-ali.youku.com/playlist/m3u8?vid=XNDAyMzc0NzA2MA&type=flvhdv3&ups_client_netip=da581706&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=6d167ebfb7179cbc4e4a42a4b8897513&duration=5874&expire=18000&drm_type=1&drm_device=7&ups_ts=1550802334&onOff=0&encr=0&ups_key=dc4c8d64f93e1ef5deec37b09edc4430" placeholder="请输入m3u8地址">
+      <input class="form-control" id="m3u8Input"
+        value="https://pl-ali.youku.com/playlist/m3u8?vid=XNDAyMzc0NzA2MA&type=flvhdv3&ups_client_netip=da581706&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=6d167ebfb7179cbc4e4a42a4b8897513&duration=5874&expire=18000&drm_type=1&drm_device=7&ups_ts=1550802334&onOff=0&encr=0&ups_key=dc4c8d64f93e1ef5deec37b09edc4430"
+        placeholder="请输入m3u8地址">
       <!--  <input class="url-input" placeholder="请输入m3u8地址" id="m3u8Input"/>-->
     </div>
   </div>
 
   <div class="row">
-    <label class="label">文  件  名: </label>
+    <label class="label">文 件 名: </label>
     <div class="tooltip" id="filenameTooltip">
       <input class="form-control" placeholder="请输入文件名" id="filenameInput"/>
       <span class="fs-16" id="ext"></span>
@@ -34,18 +35,16 @@
     <button class="btn" id="chooseDirBtn">浏览</button>
     <button class="btn" id="downloadBtn">立即下载</button>
   </div>
-  <div class="row" id="info">
-
+  <div class="info" id="info">
     <p class="prepareInfo">
-      解析m3u8...
+      准备下载...
     </p>
-    <div class="progressInfo" >
-      下载文件...<!--(<span id="doneCount">0</span>/<span id="taskCount">0</span>)-->
-    <div class="progress">
-      <div class="progress-bar progress-bar-info progress-bar-striped active" id="progressBar">
-        <span id="percent"></span>
+    <div class="progressInfo">
+      <div class="progress">
+        <div class="progress-bar progress-bar-info progress-bar-striped active" id="progressBar">
+          <span id="percent"></span>
+        </div>
       </div>
-    </div>
     </div>
     <p class="errorInfo">
       下载失败：链接已失效

@@ -1,32 +1,42 @@
-html {
-  font-size: 12px;
- /* -webkit-app-region: drag;*/
-}
 body {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 1);
-  border-radius: 4px;
-  background: #fefefe;
+  font-size: 12px;
+  -webkit-app-region: drag;
+  background-color: inherit;
 }
-input, a, .btn {
+
+input, a, .btn, .icon-close {
   -webkit-app-region: no-drag;
 }
 
+p {
+  margin: 0;
+}
+
+.container {
+  height: 220px;
+  background: #fff;
+  border: 1px solid #dedcdd;
+}
+
 .header {
+  background: #f6f6f6;
+  border-bottom: 1px solid #dedcdd;
   font-size: 14px;
   font-weight: bold;
-  padding: 10px 10px;
+  padding: 5px 10px;
+  margin-bottom: 10px;
 }
+
 .icon-close {
   float: right;
   cursor: pointer;
 }
-.container {
 
-}
 .form-control {
   display: inline-block;
   width: auto;
 }
+
 .form-control[disabled] {
   background-color: inherit;
   cursor: text;
@@ -37,24 +47,16 @@ input, a, .btn {
   background-color: #fff;
   border-color: #ccc;
   outline: none;
+  vertical-align: top;
 }
+
 .btn[disabled] {
   cursor: pointer;
+  opacity: 1;
 }
+
 .btn:focus, .btn:active, .btn:active:focus {
   outline: none;
-}
-
-p {
-  margin: 0;
-}
-
-button {
-  cursor: pointer;
-}
-
-button[disabled] {
-  color: inherit;
 }
 
 .fs-16 {
@@ -86,7 +88,7 @@ button[disabled] {
   top: 27px;
   left: 30px;
   background: white;
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, .2);
   border-bottom-color: transparent;
   border-right-color: transparent;
   transform: rotate(45deg);
@@ -101,15 +103,24 @@ button[disabled] {
   padding: 6px 10px;
   background: #fff;
   color: #666;
-  border: 1px solid rgba(0,0,0,.2);
-  box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, .2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
   border-radius: 4px;
   font-family: monospace;
   z-index: 2;
 }
 
+.info {
+  padding: 6px 16px;
+}
 .prepareInfo, .progressInfo, .errorInfo, .finishInfo {
+  height: 20px;
+  margin-left: 16px;
   display: none;
+}
+
+.progressInfo {
+  margin-left: 0;
 }
 
 .info-prepare .prepareInfo {
@@ -126,6 +137,11 @@ button[disabled] {
 
 .info-success .finishInfo {
   display: inherit;
+}
+
+
+.progress {
+  margin-bottom: 0;
 }
 .progress-bar {
   transition: none;

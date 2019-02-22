@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { ipcRenderer, shell } = require('electron')
-const { resolve, download } = require('./background/download')
+const { resolve, download, cancel } = require('./background/download')
 
 const querySelector = document.querySelector.bind(document)
 const addEventListener = function (selector, event, handler) {
@@ -18,6 +18,7 @@ const downloadInfo = (function () {
   filenameInput.value = Date.now()
   querySelector('#ext').innerHTML = ext
   return {
+    isDownloading: false,
     getM3u8Url () {
       return querySelector('#m3u8Input').value
     },
@@ -26,7 +27,6 @@ const downloadInfo = (function () {
     },
     setSavePath (path) {
       localStorage.setItem('savePath', path)
-      console.log(path)
       savePathInput.value = path
     },
     getFilename () {
@@ -61,10 +61,6 @@ addEventListener('#openDir', 'click', function () {
 
 addEventListener('#openFile', 'click', function () {
   shell.openItem(downloadInfo.getFullPath())
-})
-
-addEventListener('#closeBtn', 'click', function () {
-  confirm('有下载任务正在进行，是否退出？')
 })
 
 addEventListener('#downloadBtn', 'click', function () {
@@ -135,6 +131,7 @@ const showTips = (function () {
 }())
 
 function setInfoStatus (status) {
+  downloadInfo.isDownloading = status === 'progress'
   querySelector('#info').className = status === 'init' ? 'row' : `row info-${status}`
 }
 
@@ -150,4 +147,17 @@ function unlockBtn () {
   querySelector('#downloadBtn').removeAttribute('disabled')
   querySelector('#m3u8Input').removeAttribute('disabled')
   querySelector('#filenameInput').removeAttribute('disabled')
+}
+
+function exit () {
+  ipcRenderer.send('exit')
+}
+
+addEventListener('#closeBtn', 'click', function () {
+  if (!downloadInfo.isDownloading) exit()
+  else if (confirm('有下载任务正在进行，是否退出？')) cancel().then(exit)
+})
+
+window.onbeforeunload = function () {
+  if (downloadInfo.isDownloading) cancel()
 }
