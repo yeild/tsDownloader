@@ -12,7 +12,7 @@ const downloadInfo = (function () {
   const defaultSavePath = localStorage.getItem('savePath') || 'C:'
   const ext = '.ts' // 文件默认后缀
   const savePathInput = querySelector('#savePathInput')
-  const filenameInput = querySelector('#filename')
+  const filenameInput = querySelector('#filenameInput')
 
   savePathInput.value = defaultSavePath
   filenameInput.value = Date.now()
@@ -38,7 +38,7 @@ const downloadInfo = (function () {
   }
 }())
 
-addEventListener('#filename', 'input', function () {
+addEventListener('#filenameInput', 'input', function () {
   const value = this.value
   const reg = /[\\/:*?"<>|]/g
   if (reg.test(value)) {
@@ -63,12 +63,16 @@ addEventListener('#openFile', 'click', function () {
   shell.openItem(downloadInfo.getFullPath())
 })
 
+addEventListener('#closeBtn', 'click', function () {
+  confirm('有下载任务正在进行，是否退出？')
+})
+
 addEventListener('#downloadBtn', 'click', function () {
   if (querySelector('#m3u8Input').value === '') {
     showTips('url', `请输入下载地址`)
     return
   }
-  if (querySelector('#filename').value === '') {
+  if (querySelector('#filenameInput').value === '') {
     showTips('filename', `请输入文件名`)
     return
   }
@@ -80,19 +84,24 @@ addEventListener('#downloadBtn', 'click', function () {
   lockBtn()
   const id = setTimeout(function () {
     setInfoStatus('prepare') // 延迟显示准备信息，防止信息闪现
-  }, 1000)
+  }, 400)
   resolve({
     m3u8: downloadInfo.getM3u8Url(),
     savePath: downloadInfo.getSavePath(),
     filename: downloadInfo.getFilename()
   }).then(function (videoList) {
     clearTimeout(id)
-    querySelector('#taskCount').innerHTML = videoList.length
+    // querySelector('#taskCount').innerHTML = videoList.length
+    const totalCount = videoList.length
     setInfoStatus('progress')
+    querySelector('#progressBar').style.width = 0
+    querySelector('#percent').innerHTML = ''
     download({
       videoList,
       progress ({ doneCount }) {
-        querySelector('#doneCount').innerHTML = doneCount
+        const percent = (doneCount / totalCount * 100).toFixed(2)
+        querySelector('#progressBar').style.width = percent + '%'
+        querySelector('#percent').innerHTML = doneCount + '/' + totalCount
       },
       finish ({ doneCount, failCount }) {
         if (doneCount === 0) setInfoStatus('error')
@@ -132,9 +141,13 @@ function setInfoStatus (status) {
 function lockBtn () {
   querySelector('#chooseDirBtn').setAttribute('disabled', 'disabled')
   querySelector('#downloadBtn').setAttribute('disabled', 'disabled')
+  querySelector('#m3u8Input').setAttribute('disabled', 'disabled')
+  querySelector('#filenameInput').setAttribute('disabled', 'disabled')
 }
 
 function unlockBtn () {
   querySelector('#chooseDirBtn').removeAttribute('disabled')
   querySelector('#downloadBtn').removeAttribute('disabled')
+  querySelector('#m3u8Input').removeAttribute('disabled')
+  querySelector('#filenameInput').removeAttribute('disabled')
 }

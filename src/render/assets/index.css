@@ -1,9 +1,48 @@
 html {
   font-size: 12px;
+ /* -webkit-app-region: drag;*/
+}
+body {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  border-radius: 4px;
+  background: #fefefe;
+}
+input, a, .btn {
+  -webkit-app-region: no-drag;
 }
 
+.header {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 10px 10px;
+}
+.icon-close {
+  float: right;
+  cursor: pointer;
+}
 .container {
-  width: 400px;
+
+}
+.form-control {
+  display: inline-block;
+  width: auto;
+}
+.form-control[disabled] {
+  background-color: inherit;
+  cursor: text;
+}
+
+.btn {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+  outline: none;
+}
+.btn[disabled] {
+  cursor: pointer;
+}
+.btn:focus, .btn:active, .btn:active:focus {
+  outline: none;
 }
 
 p {
@@ -29,6 +68,7 @@ button[disabled] {
 .label {
   display: inline-block;
   width: 70px;
+  margin-right: 5px;
   text-align: right;
 }
 
@@ -41,12 +81,12 @@ button[disabled] {
   content: '';
   position: absolute;
   display: block;
-  width: 8px;
-  height: 8px;
-  top: 25px;
+  width: 10px;
+  height: 10px;
+  top: 27px;
   left: 30px;
   background: white;
-  border: 1px solid #000;
+  border: 1px solid rgba(0,0,0,.2);
   border-bottom-color: transparent;
   border-right-color: transparent;
   transform: rotate(45deg);
@@ -56,11 +96,13 @@ button[disabled] {
 .tooltip-active:after {
   content: attr(tips);
   position: absolute;
-  top: 30px;
+  top: 32px;
   left: 10px;
   padding: 6px 10px;
   background: #fff;
-  border: 1px solid #000;
+  color: #666;
+  border: 1px solid rgba(0,0,0,.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,.2);
   border-radius: 4px;
   font-family: monospace;
   z-index: 2;
@@ -84,4 +126,7 @@ button[disabled] {
 
 .info-success .finishInfo {
   display: inherit;
+}
+.progress-bar {
+  transition: none;
 }

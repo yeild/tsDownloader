@@ -34,7 +34,7 @@ exports.resolve = function ({ m3u8, savePath, filename }) {
   return new Promise(function (resolve, reject) {
     const videoList = []
     get({ url: m3u8 }).then(function ({ statusCode, data }) {
-      if (statusCode !== 200) return reject(statusCode)
+      if (statusCode !== 200) return reject('未能识别到视频文件')
       const lines = data.split('\n')
       const encryptInfo = {}
       lines.forEach(function (line, index) {

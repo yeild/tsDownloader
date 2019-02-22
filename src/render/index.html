@@ -2,37 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ts视频合并下载器</title>
-  <link rel="stylesheet" href="index.css"/>
+  <title>ts视频下载器</title>
+  <link rel="stylesheet" href="assets/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/index.css"/>
 </head>
 <body>
 <div class="container">
+  <div class="header">
+    ts视频下载器
+    <img src="assets/close.png" class="icon-close" id="closeBtn">
+  </div>
+
   <div class="row">
-    <label class="label">下载地址:</label>
+    <label class="label">下载地址: </label>
     <div class="tooltip" id="urlTooltip">
-      <input class="url-input" placeholder="请输入m3u8地址" id="m3u8Input"/>
+      <input class="form-control" id="m3u8Input" value="https://pl-ali.youku.com/playlist/m3u8?vid=XNDAyMzc0NzA2MA&type=flvhdv3&ups_client_netip=da581706&utid=cfEEFNoeNkUCAW644spAMPsE&ccode=0502&psid=6d167ebfb7179cbc4e4a42a4b8897513&duration=5874&expire=18000&drm_type=1&drm_device=7&ups_ts=1550802334&onOff=0&encr=0&ups_key=dc4c8d64f93e1ef5deec37b09edc4430" placeholder="请输入m3u8地址">
+      <!--  <input class="url-input" placeholder="请输入m3u8地址" id="m3u8Input"/>-->
     </div>
   </div>
+
   <div class="row">
-    <label class="label">文件名:</label>
+    <label class="label">文  件  名: </label>
     <div class="tooltip" id="filenameTooltip">
-      <input class="url-input" id="filename"/>
+      <input class="form-control" placeholder="请输入文件名" id="filenameInput"/>
       <span class="fs-16" id="ext"></span>
     </div>
   </div>
   <div class="row">
-    <label class="label">保存路径:</label>
-    <input class="url-input" readonly id="savePathInput"/>
+    <label class="label">保存路径: </label>
+    <input class="form-control" disabled id="savePathInput"/>
     <button class="btn" id="chooseDirBtn">浏览</button>
     <button class="btn" id="downloadBtn">立即下载</button>
   </div>
   <div class="row" id="info">
+
     <p class="prepareInfo">
       解析m3u8...
     </p>
-    <p class="progressInfo" hidden>
-      下载文件...(<span id="doneCount">0</span>/<span id="taskCount">0</span>)
-    </p>
+    <div class="progressInfo" >
+      下载文件...<!--(<span id="doneCount">0</span>/<span id="taskCount">0</span>)-->
+    <div class="progress">
+      <div class="progress-bar progress-bar-info progress-bar-striped active" id="progressBar">
+        <span id="percent"></span>
+      </div>
+    </div>
+    </div>
     <p class="errorInfo">
       下载失败：链接已失效
     </p>
@@ -44,6 +58,6 @@
     </p>
   </div>
 </div>
-<script src="index.js"></script>
+<script src="assets/index.js"></script>
 </body>
 </html>
