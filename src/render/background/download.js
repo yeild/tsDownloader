@@ -68,12 +68,14 @@ exports.resolve = function ({ m3u8, savePath, filename }) {
         })
       })
       if (videoList.length === 0) reject('未能识别到视频文件')
-      if (!encryptInfo.key) resolve(videoList)
+      if (!encryptInfo.URI) resolve(videoList)
       else {
-        get({ url: new URL(encryptInfo.key, m3u8).href}).then(function ({ statusCode, data }) {
+        get({ url: new URL(encryptInfo.URI, m3u8).href}).then(function ({ statusCode, data }) {
           if (statusCode !== 200) return reject('获取密钥失败')
           downloadConfig.key = data
           resolve(videoList)
+        }).catch(e => {
+          console.log(e)
         })
       }
     }).catch(function (e) {

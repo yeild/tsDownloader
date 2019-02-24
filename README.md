@@ -6,7 +6,7 @@
 
 ## 用法
 
-1. 下载并解压[tsDownloader](https://pan.baidu.com/s/1jcVvkOAPg0iqMGDp5HGAzA)
+1. 下载并解压[tsDownloader](https://pan.baidu.com/s/1xbB5RpSl0aRhU7emM6T20A)
 
 2. 打开tsDownloader.exe, 填入m3u8链接然后点击下载按钮。
 
